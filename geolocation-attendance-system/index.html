@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GeoAttend - Smart University Attendance Management System</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/auth.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav style="background-color: var(--primary); padding: 1rem 2rem;">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+      <div style="font-size: 1.5rem; font-weight: 700; color: white;">GeoAttend</div>
+      <div>
+        <a href="login.html" class="btn btn-outline" style="margin-right: 1rem;">Login</a>
+        <a href="register.html" class="btn btn-secondary">Register</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <div class="landing-hero">
+    <div class="container">
+      <h1>Smart Attendance.</h1>
+      <h1>Verified by Location.</h1>
+      <p>A modern university attendance management system designed to simplify attendance while verifying student presence at authorized learning venues.</p>
+      <div class="landing-cta">
+        <a href="login.html" class="btn btn-secondary" style="background-color: white; color: var(--primary); padding: 0.75rem 2rem;">Student Login</a>
+        <a href="login.html" class="btn btn-outline" style="border-color: white; color: white; padding: 0.75rem 2rem;">Lecturer Login</a>
+        <a href="login.html" class="btn btn-outline" style="border-color: white; color: white; padding: 0.75rem 2rem;">Admin Login</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- How It Works -->
+  <div class="landing-section">
+    <div class="container">
+      <h2>How It Works</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">📱</div>
+          <h3>Check-In</h3>
+          <p>Students can mark attendance from any device with GPS enabled.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📍</div>
+          <h3>Location Verification</h3>
+          <p>The system verifies the student's location is within the venue radius.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">✓</div>
+          <h3>Instant Confirmation</h3>
+          <p>Attendance is recorded instantly with a confirmation message.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features Section -->
+  <div class="landing-section" style="background-color: var(--background);">
+    <div class="container">
+      <h2>Key Features</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🎯</div>
+          <h3>Location-Based Verification</h3>
+          <p>Using GPS and Haversine calculations to verify student location with customizable radius.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">👥</div>
+          <h3>Role-Based Access</h3>
+          <p>Students, Lecturers, and Admins have tailored interfaces and permissions.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>Real-Time Dashboards</h3>
+          <p>View attendance statistics and reports instantly.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <h3>Security Controls</h3>
+          <p>Duplicate prevention, device tracking, and session management.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📈</div>
+          <h3>Analytics & Reports</h3>
+          <p>Track attendance patterns and generate comprehensive reports.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📱</div>
+          <h3>Mobile Responsive</h3>
+          <p>Fully responsive design works on desktop, tablet, and mobile.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Student Workflow -->
+  <div class="landing-section">
+    <div class="container">
+      <h2>Student Workflow</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">1️⃣</div>
+          <h3>Login</h3>
+          <p>Access your student dashboard with your credentials.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">2️⃣</div>
+          <h3>View Sessions</h3>
+          <p>See available attendance sessions for your units.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">3️⃣</div>
+          <h3>Mark Attendance</h3>
+          <p>Enable GPS and mark your attendance when at the venue.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">4️⃣</div>
+          <h3>View History</h3>
+          <p>Check your attendance records and percentages.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Demo Information -->
+  <div class="landing-section" style="background-color: var(--background);">
+    <div class="container">
+      <h2>Demo Credentials</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; max-width: 1000px; margin: 0 auto;">
+        
+        <!-- Student Demo -->
+        <div class="card">
+          <h3 style="color: var(--primary);">👨‍🎓 Student</h3>
+          <div class="credential-item">
+            <strong>Email:</strong> <code>student@demo.com</code>
+          </div>
+          <div class="credential-item">
+            <strong>Password:</strong> <code>123456</code>
+          </div>
+          <div class="credential-item">
+            <strong>Name:</strong> Brian Student
+          </div>
+          <div class="credential-item">
+            <strong>Registration:</strong> EDU/001/2026
+          </div>
+          <div style="margin-top: 1rem;">
+            <a href="login.html" class="btn btn-primary" style="width: 100%;">Login as Student</a>
+          </div>
+        </div>
+
+        <!-- Lecturer Demo -->
+        <div class="card">
+          <h3 style="color: var(--secondary);">👨‍🏫 Lecturer</h3>
+          <div class="credential-item">
+            <strong>Email:</strong> <code>lecturer@demo.com</code>
+          </div>
+          <div class="credential-item">
+            <strong>Password:</strong> <code>123456</code>
+          </div>
+          <div class="credential-item">
+            <strong>Name:</strong> Dr. John Lecturer
+          </div>
+          <div class="credential-item">
+            <strong>Department:</strong> School of Design
+          </div>
+          <div style="margin-top: 1rem;">
+            <a href="login.html" class="btn btn-secondary" style="width: 100%;">Login as Lecturer</a>
+          </div>
+        </div>
+
+        <!-- Admin Demo -->
+        <div class="card">
+          <h3 style="color: var(--accent);">👨‍💼 Admin</h3>
+          <div class="credential-item">
+            <strong>Email:</strong> <code>admin@demo.com</code>
+          </div>
+          <div class="credential-item">
+            <strong>Password:</strong> <code>admin123</code>
+          </div>
+          <div class="credential-item">
+            <strong>Name:</strong> System Administrator
+          </div>
+          <div class="credential-item">
+            <strong>Role:</strong> Full System Access
+          </div>
+          <div style="margin-top: 1rem;">
+            <a href="login.html" class="btn btn-warning" style="width: 100%;">Login as Admin</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Technology Info -->
+  <div class="landing-section">
+    <div class="container">
+      <h2>Technology Stack</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🏗️</div>
+          <h3>Frontend Only</h3>
+          <p>Built with vanilla HTML5, CSS3, and JavaScript ES6+</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">💾</div>
+          <h3>LocalStorage</h3>
+          <p>All data persisted locally for demonstration purposes</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📍</div>
+          <h3>Browser Geolocation</h3>
+          <p>Uses HTML5 Geolocation API with Haversine distance calculation</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🎨</div>
+          <h3>Responsive Design</h3>
+          <p>Mobile-first approach with CSS Grid and Flexbox</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>No Dependencies</h3>
+          <p>Zero external libraries or frameworks - pure vanilla code</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🧪</div>
+          <h3>Demo Mode</h3>
+          <p>Location simulation mode for testing without GPS</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA Section -->
+  <div class="landing-hero" style="margin-top: 3rem; padding: 3rem 2rem;">
+    <div class="container">
+      <h2 style="color: white; margin-bottom: 1.5rem;">Ready to Get Started?</h2>
+      <p style="color: rgba(255, 255, 255, 0.9); font-size: 1.1rem; margin-bottom: 2rem;">
+        Test the complete attendance management system with demo credentials.
+      </p>
+      <div class="landing-cta">
+        <a href="login.html" class="btn btn-secondary" style="background-color: white; color: var(--primary); padding: 0.75rem 2rem; font-weight: 600;">Go to Login</a>
+        <a href="register.html" class="btn btn-outline" style="border-color: white; color: white; padding: 0.75rem 2rem; font-weight: 600;">Register as Student</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer style="background-color: var(--text); color: white; padding: 2rem; text-align: center;">
+    <div class="container">
+      <p style="margin-bottom: 0.5rem;"><strong>GeoAttend v1.0</strong></p>
+      <p style="margin-bottom: 0.5rem; color: rgba(255, 255, 255, 0.8);">Smart University Attendance Management System</p>
+      <p style="font-size: 0.875rem; color: rgba(255, 255, 255, 0.6);">
+        This is a frontend prototype demonstrating geolocation-based attendance tracking.<br>
+        Production deployment requires secure backend implementation.
+      </p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/storage.js"></script>
+  <script src="js/dummy-data.js"></script>
+  <script src="js/location.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    // Initialize on page load
+    window.addEventListener('load', () => {
+      console.log('🎓 GeoAttend - Smart University Attendance Management System');
+      console.log('📍 Frontend Prototype | Vanilla HTML5, CSS3, JavaScript');
+      console.log('💾 All data stored in LocalStorage');
+    });
+  </script>
+</body>
+</html>

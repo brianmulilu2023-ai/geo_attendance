@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lecturer Dashboard - GeoAttend</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/attendance.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">GeoAttend</div>
+        <div class="sidebar-subtitle">Lecturer Portal</div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#" class="sidebar-nav-item active" onclick="switchTab('dashboard', event)">
+          📊 Dashboard
+        </a>
+        <a href="#" class="sidebar-nav-item" onclick="switchTab('units', event)">
+          📚 My Units
+        </a>
+        <a href="#" class="sidebar-nav-item" onclick="switchTab('sessions', event)">
+          📅 Sessions
+        </a>
+        <a href="#" class="sidebar-nav-item" onclick="switchTab('create-session', event)">
+          ➕ Create Session
+        </a>
+        <a href="#" class="sidebar-nav-item" onclick="switchTab('attendance', event)">
+          ✓ Attendance
+        </a>
+        <a href="#" class="sidebar-nav-item" onclick="switchTab('reports', event)">
+          📊 Reports
+        </a>
+        <a href="#" class="sidebar-nav-item" onclick="switchTab('profile', event)">
+          👤 Profile
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="sidebar-user-avatar" id="userAvatar">L</div>
+          <div class="sidebar-user-name" id="userName">Loading...</div>
+          <div class="sidebar-user-role">Lecturer</div>
+        </div>
+        <button class="sidebar-logout" onclick="App.logout()">Logout</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Top Bar -->
+      <div class="topbar">
+        <div class="topbar-title">
+          <h1 id="pageTitle">Dashboard</h1>
+        </div>
+        <div class="topbar-actions">
+          <div class="hamburger" onclick="toggleSidebar()">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content Area -->
+      <div class="content-area">
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+          <div class="section">
+            <h2>Dashboard</h2>
+            <div class="dashboard-panels">
+              <div class="dashboard-panel">
+                <div class="panel-label">Assigned Units</div>
+                <div class="panel-value" id="assignedUnits">-</div>
+              </div>
+              <div class="dashboard-panel accent">
+                <div class="panel-label">Active Sessions</div>
+                <div class="panel-value" id="activeSessions">-</div>
+              </div>
+              <div class="dashboard-panel success">
+                <div class="panel-label">Students Present Today</div>
+                <div class="panel-value" id="presentToday">-</div>
+              </div>
+              <div class="dashboard-panel warning">
+                <div class="panel-label">Total Attendance</div>
+                <div class="panel-value" id="totalAttendance">-</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Sessions -->
+          <div class="section">
+            <div class="section-header">
+              <h2>Active Attendance Sessions</h2>
+            </div>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Unit</th>
+                    <th>Venue</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Radius</th>
+                    <th>Present</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="sessionsList">
+                  <tr><td colspan="8" class="text-center">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- My Units Tab -->
+        <div id="units" class="tab-content">
+          <div class="section">
+            <div class="section-header">
+              <h2>My Units</h2>
+            </div>
+            <div id="unitsList" class="features-grid">
+              <!-- Populated by JavaScript -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Sessions Tab -->
+        <div id="sessions" class="tab-content">
+          <div class="section">
+            <div class="section-header">
+              <h2>All Attendance Sessions</h2>
+            </div>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Unit</th>
+                    <th>Venue</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="allSessionsList">
+                  <tr><td colspan="6" class="text-center">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Create Session Tab -->
+        <div id="create-session" class="tab-content">
+          <div class="section">
+            <div class="section-header">
+              <h2>Create Attendance Session</h2>
+            </div>
+            <form id="createSessionForm" class="session-form" onsubmit="handleCreateSession(event)">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="unitSelect" class="required">Unit</label>
+                  <select id="unitSelect" required>
+                    <option value="">-- Select Unit --</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="sessionDate" class="required">Date</label>
+                  <input type="date" id="sessionDate" required>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="startTime" class="required">Start Time</label>
+                  <input type="time" id="startTime" required>
+                </div>
+                <div class="form-group">
+                  <label for="endTime" class="required">End Time</label>
+                  <input type="time" id="endTime" required>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="venue" class="required">Venue / Location</label>
+                <input type="text" id="venue" required placeholder="e.g., Computer Lab 1">
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="latitude" class="required">Latitude</label>
+                  <input type="number" id="latitude" step="0.00001" required placeholder="-1.0968">
+                </div>
+                <div class="form-group">
+                  <label for="longitude" class="required">Longitude</label>
+                  <input type="number" id="longitude" step="0.00001" required placeholder="34.7535">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="radius" class="required">Attendance Radius (meters)</label>
+                <input type="number" id="radius" value="10" required min="1">
+              </div>
+
+              <div class="form-group">
+                <button type="button" class="btn btn-info" onclick="useCurrentLocation()" style="width: 100%;">
+                  📍 Use My Current Location
+                </button>
+              </div>
+
+              <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="resetSessionForm()">Reset</button>
+                <button type="submit" class="btn btn-primary">Create Session</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Attendance Tab -->
+        <div id="attendance" class="tab-content">
+          <div class="section">
+            <div class="section-header">
+              <h2>Attendance Records</h2>
+              <div class="action-bar">
+                <input type="text" id="attendanceSearch" placeholder="Search records..." onkeyup="searchAttendance()">
+              </div>
+            </div>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Student</th>
+                    <th>Unit</th>
+                    <th>Venue</th>
+                    <th>Time</th>
+                    <th>Distance</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="attendanceList">
+                  <tr><td colspan="7" class="text-center">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reports Tab -->
+        <div id="reports" class="tab-content">
+          <div class="section">
+            <h2>Attendance Reports</h2>
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-card-label">Total Sessions</div>
+                <div class="stat-card-value" id="reportTotalSessions">-</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card-label">Completed Sessions</div>
+                <div class="stat-card-value" id="reportCompletedSessions">-</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card-label">Total Records</div>
+                <div class="stat-card-value" id="reportTotalRecords">-</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card-label">Average Attendance</div>
+                <div class="stat-card-value" id="reportAvgAttendance">-%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile Tab -->
+        <div id="profile" class="tab-content">
+          <div class="section">
+            <div class="card">
+              <div class="card-header">
+                <h2>Profile Information</h2>
+              </div>
+              <div class="card-body">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
+                  <div>
+                    <label style="color: var(--text-light); font-size: 0.875rem;">Name</label>
+                    <p id="profileName" style="font-weight: 600;">-</p>
+                  </div>
+                  <div>
+                    <label style="color: var(--text-light); font-size: 0.875rem;">Email</label>
+                    <p id="profileEmail" style="font-weight: 600;">-</p>
+                  </div>
+                  <div>
+                    <label style="color: var(--text-light); font-size: 0.875rem;">Department</label>
+                    <p id="profileDept" style="font-weight: 600;">-</p>
+                  </div>
+                  <div>
+                    <label style="color: var(--text-light); font-size: 0.875rem;">Phone</label>
+                    <p id="profilePhone" style="font-weight: 600;">-</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Container -->
+  <div id="notification-container" class="notification-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/storage.js"></script>
+  <script src="js/dummy-data.js"></script>
+  <script src="js/location.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/attendance.js"></script>
+  <script src="js/lecturer.js"></script>
+
+  <script>
+    let currentUser = null;
+
+    window.addEventListener('load', () => {
+      if (!App.requireAuth() || !App.checkAccess('lecturer')) return;
+      
+      currentUser = Auth.getCurrentUser();
+      initializeLecturerDashboard();
+    });
+
+    function initializeLecturerDashboard() {
+      const userInitial = currentUser.name.charAt(0).toUpperCase();
+      document.getElementById('userAvatar').textContent = userInitial;
+      document.getElementById('userName').textContent = currentUser.name.split(' ')[0];
+
+      loadDashboardData();
+      loadUnits();
+      loadAllSessions();
+      loadAttendanceRecords();
+      loadReports();
+      loadProfile();
+      populateUnitSelect();
+      setTodayDate();
+    }
+
+    function loadDashboardData() {
+      const data = Lecturer.getDashboardData(currentUser.id);
+      
+      document.getElementById('assignedUnits').textContent = data.stats.assignedUnits;
+      document.getElementById('activeSessions').textContent = data.stats.activeSessions;
+      document.getElementById('presentToday').textContent = data.stats.studentsPresentToday;
+      document.getElementById('totalAttendance').textContent = data.stats.totalAttendance;
+
+      const tbody = document.getElementById('sessionsList');
+      tbody.innerHTML = '';
+
+      data.sessions.forEach(session => {
+        const unit = Storage.getById('units', session.unitId);
+        tbody.innerHTML += `
+          <tr>
+            <td>${unit.code}</td>
+            <td>${session.venue}</td>
+            <td>${session.date}</td>
+            <td>${session.startTime} - ${session.endTime}</td>
+            <td>${session.radius}m</td>
+            <td>${session.studentsPresent ? session.studentsPresent.length : 0}</td>
+            <td>${App.getStatusBadge(session.status)}</td>
+            <td>
+              <button class="btn btn-sm btn-secondary" onclick="viewSessionAttendance('${session.id}')">View</button>
+              ${session.status === 'active' ? `<button class="btn btn-sm btn-danger" onclick="endSession('${session.id}')">End</button>` : ''}
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function loadUnits() {
+      const units = Lecturer.getLecturerUnits(currentUser.id);
+      const container = document.getElementById('unitsList');
+      container.innerHTML = '';
+
+      if (units.length === 0) {
+        container.innerHTML = '<div class="empty-state">No units assigned</div>';
+        return;
+      }
+
+      units.forEach(unit => {
+        container.innerHTML += `
+          <div class="feature-card">
+            <h3>${unit.code}</h3>
+            <p><strong>${unit.name}</strong></p>
+            <p style="font-size: 0.875rem; color: var(--text-light);">
+              Students: ${unit.studentCount} | Sessions: ${unit.activeSessions}
+            </p>
+          </div>
+        `;
+      });
+    }
+
+    function loadAllSessions() {
+      const sessions = Lecturer.getAllSessions(currentUser.id);
+      const tbody = document.getElementById('allSessionsList');
+      tbody.innerHTML = '';
+
+      if (sessions.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center">No sessions created</td></tr>';
+        return;
+      }
+
+      sessions.forEach(session => {
+        const unit = Storage.getById('units', session.unitId);
+        tbody.innerHTML += `
+          <tr>
+            <td>${unit.code}</td>
+            <td>${session.venue}</td>
+            <td>${session.date}</td>
+            <td>${session.startTime} - ${session.endTime}</td>
+            <td>${App.getStatusBadge(session.status)}</td>
+            <td>
+              <button class="btn btn-sm btn-info" onclick="viewSessionAttendance('${session.id}')">Details</button>
+              ${session.status === 'scheduled' ? `<button class="btn btn-sm btn-success" onclick="startSession('${session.id}')">Start</button>` : ''}
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function loadAttendanceRecords() {
+      const records = Lecturer.getAttendanceRecords(currentUser.id);
+      const tbody = document.getElementById('attendanceList');
+      tbody.innerHTML = '';
+
+      if (records.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center">No attendance records</td></tr>';
+        return;
+      }
+
+      records.slice(0, 20).forEach(record => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${record.date}</td>
+            <td>${record.studentName}</td>
+            <td>${record.unitCode}</td>
+            <td>${record.sessionVenue}</td>
+            <td>${record.time}</td>
+            <td>${record.distance}m</td>
+            <td>${App.getStatusBadge(record.status)}</td>
+          </tr>
+        `;
+      });
+    }
+
+    function loadReports() {
+      const stats = Lecturer.getAttendanceStats(currentUser.id);
+      
+      document.getElementById('reportTotalSessions').textContent = stats.totalSessions;
+      document.getElementById('reportCompletedSessions').textContent = stats.completedSessions;
+      document.getElementById('reportTotalRecords').textContent = stats.totalRecords;
+      document.getElementById('reportAvgAttendance').textContent = App.formatPercentage(stats.averageAttendance, 0);
+    }
+
+    function loadProfile() {
+      const lecturer = Storage.getById('lecturers', currentUser.id);
+      
+      document.getElementById('profileName').textContent = lecturer.name;
+      document.getElementById('profileEmail').textContent = lecturer.email;
+      document.getElementById('profileDept').textContent = lecturer.department;
+      document.getElementById('profilePhone').textContent = lecturer.phoneNumber;
+    }
+
+    function populateUnitSelect() {
+      const units = Lecturer.getLecturerUnits(currentUser.id);
+      const select = document.getElementById('unitSelect');
+      select.innerHTML = '<option value="">-- Select Unit --</option>';
+
+      units.forEach(unit => {
+        select.innerHTML += `<option value="${unit.id}">${unit.code} - ${unit.name}</option>`;
+      });
+    }
+
+    function setTodayDate() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('sessionDate').value = today;
+    }
+
+    function handleCreateSession(event) {
+      event.preventDefault();
+
+      const data = {
+        unitId: document.getElementById('unitSelect').value,
+        date: document.getElementById('sessionDate').value,
+        startTime: document.getElementById('startTime').value,
+        endTime: document.getElementById('endTime').value,
+        venue: document.getElementById('venue').value,
+        latitude: parseFloat(document.getElementById('latitude').value),
+        longitude: parseFloat(document.getElementById('longitude').value),
+        radius: parseInt(document.getElementById('radius').value)
+      };
+
+      const result = Lecturer.createSession(currentUser.id, data);
+
+      if (result.success) {
+        App.notify('✓ Session created successfully', 'success');
+        resetSessionForm();
+        loadDashboardData();
+        loadAllSessions();
+      } else {
+        App.notify(result.message, 'error');
+      }
+    }
+
+    function resetSessionForm() {
+      document.getElementById('createSessionForm').reset();
+      setTodayDate();
+    }
+
+    function useCurrentLocation() {
+      Location.getCurrentLocation()
+        .then(position => {
+          document.getElementById('latitude').value = position.latitude.toFixed(5);
+          document.getElementById('longitude').value = position.longitude.toFixed(5);
+          App.notify('📍 Location captured from GPS', 'success');
+        })
+        .catch(error => {
+          App.notify(error.message, 'error');
+        });
+    }
+
+    function startSession(sessionId) {
+      const result = Lecturer.startSession(sessionId);
+      if (result.success) {
+        App.notify('✓ Attendance session started', 'success');
+        loadDashboardData();
+        loadAllSessions();
+      } else {
+        App.notify(result.message, 'error');
+      }
+    }
+
+    function endSession(sessionId) {
+      const result = Lecturer.endSession(sessionId);
+      if (result.success) {
+        App.notify('✓ Attendance session ended', 'success');
+        loadDashboardData();
+        loadAllSessions();
+      } else {
+        App.notify(result.message, 'error');
+      }
+    }
+
+    function viewSessionAttendance(sessionId) {
+      const details = Lecturer.getSessionAttendance(sessionId);
+      const content = `
+        <div style="max-height: 500px; overflow-y: auto;">
+          <h4>${Storage.getById('units', details.session.unitId).name}</h4>
+          <p><strong>Venue:</strong> ${details.session.venue}</p>
+          <p><strong>Date:</strong> ${details.session.date} | <strong>Time:</strong> ${details.session.startTime} - ${details.session.endTime}</p>
+          
+          <h5 style="margin-top: 1.5rem;">Attendance (${details.attendance.length}/${details.totalStudents})</h5>
+          <div class="table-container" style="margin-bottom: 1rem;">
+            <table>
+              <thead>
+                <tr><th>Student Name</th><th>Registration</th><th>Time</th><th>Distance</th></tr>
+              </thead>
+              <tbody>
+                ${details.attendance.map(r => `
+                  <tr>
+                    <td>${r.studentName}</td>
+                    <td>${r.registrationNumber}</td>
+                    <td>${r.time}</td>
+                    <td>${r.distance}m</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+
+          ${details.absent.length > 0 ? `
+            <h5>Absent (${details.absent.length})</h5>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr><th>Student Name</th><th>Registration</th></tr>
+                </thead>
+                <tbody>
+                  ${details.absent.map(s => `
+                    <tr><td>${s.name}</td><td>${s.registrationNumber}</td></tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          ` : ''}
+        </div>
+      `;
+      
+      App.showModal('Session Attendance', content, [
+        { label: 'Close', type: 'secondary', action: 'this.closest(".modal").remove()' }
+      ]);
+    }
+
+    function switchTab(tabName, event) {
+      if (event) event.preventDefault();
+
+      const contents = document.querySelectorAll('.tab-content');
+      contents.forEach(c => c.classList.remove('active'));
+      document.getElementById(tabName).classList.add('active');
+
+      const titles = {
+        'dashboard': 'Dashboard',
+        'units': 'My Units',
+        'sessions': 'All Sessions',
+        'create-session': 'Create Session',
+        'attendance': 'Attendance Records',
+        'reports': 'Reports',
+        'profile': 'Profile'
+      };
+      document.getElementById('pageTitle').textContent = titles[tabName];
+    }
+
+    function toggleSidebar() {
+      document.querySelector('.sidebar').classList.toggle('open');
+    }
+
+    function searchAttendance() {
+      const query = document.getElementById('attendanceSearch').value;
+      const records = Lecturer.searchAttendance(currentUser.id, query);
+      const tbody = document.getElementById('attendanceList');
+      tbody.innerHTML = '';
+
+      if (records.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center">No records found</td></tr>';
+        return;
+      }
+
+      records.forEach(record => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${record.date}</td>
+            <td>${record.studentName}</td>
+            <td>${record.unitCode}</td>
+            <td>${record.sessionVenue}</td>
+            <td>${record.time}</td>
+            <td>${record.distance}m</td>
+            <td>${App.getStatusBadge(record.status)}</td>
+          </tr>
+        `;
+      });
+    }
+  </script>
+</body>
+</html>

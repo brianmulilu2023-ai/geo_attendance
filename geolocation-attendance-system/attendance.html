@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendance Verification - GeoAttend</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/attendance.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem;">
+  <div id="attendanceContainer" style="width: 100%; max-width: 600px;">
+    <!-- Header -->
+    <div style="background: white; border-radius: 1rem 1rem 0 0; padding: 2rem; border-bottom: 2px solid var(--border);">
+      <h1 style="margin: 0; color: var(--primary); font-size: 1.875rem;">Mark Attendance</h1>
+      <p style="margin: 0.5rem 0 0; color: var(--text-light); font-size: 0.875rem;">Geolocation-Based Attendance</p>
+      <div style="margin-top: 1rem; display: flex; justify-content: space-between;">
+        <div>
+          <a href="student-dashboard.html" class="btn btn-sm btn-secondary">← Back to Dashboard</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div style="background: white; padding: 2rem;">
+      <!-- Session Selection -->
+      <div class="attendance-form" id="sessionSelection">
+        <div class="form-section">
+          <h4>Select Attendance Session</h4>
+          <div class="form-group">
+            <label for="sessionSelect" class="required">Available Sessions</label>
+            <select id="sessionSelect" onchange="selectSession()">
+              <option value="">-- Loading sessions --</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Session Details & Location Verification -->
+      <div id="sessionDetailsContainer" style="display: none;">
+        <!-- Session Info Card -->
+        <div class="attendance-session-card">
+          <div class="session-info">
+            <h3 id="sessionUnitName">-</h3>
+          </div>
+          <div class="session-meta">
+            <div class="session-detail">
+              <div class="detail-label">Lecturer</div>
+              <div class="detail-value" id="sessionLecturerName">-</div>
+            </div>
+            <div class="session-detail">
+              <div class="detail-label">Venue</div>
+              <div class="detail-value" id="sessionVenue">-</div>
+            </div>
+            <div class="session-detail">
+              <div class="detail-label">Time</div>
+              <div class="detail-value" id="sessionTime">-</div>
+            </div>
+            <div class="session-detail">
+              <div class="detail-label">Status</div>
+              <div class="detail-value" id="sessionStatus">-</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Demo Mode Panel -->
+        <div class="demo-mode-panel" id="demoModePanel">
+          <div class="demo-mode-header">
+            <div class="demo-mode-icon">🧪</div>
+            <div>
+              <div class="demo-mode-title">DEMO MODE — Location Simulation</div>
+              <div class="demo-mode-label">Select a simulated distance for testing</div>
+            </div>
+          </div>
+          <div class="demo-controls">
+            <button class="btn" onclick="setDemoDistance(5)">📍 5m Away (Inside)</button>
+            <button class="btn" onclick="setDemoDistance(10)">📍 10m Away (Edge)</button>
+            <button class="btn" onclick="setDemoDistance(25)">📍 25m Away (Outside)</button>
+            <button class="btn btn-info" onclick="Location.disableDemoMode(); updateLocation()">📡 Use Real GPS</button>
+          </div>
+        </div>
+
+        <!-- Location Status -->
+        <div class="location-card">
+          <div class="location-status">
+            <div class="location-icon" id="locationIcon">📍</div>
+            <div class="location-info">
+              <div class="location-title">Your Location</div>
+              <div class="location-subtitle" id="locationSubtitle">Checking...</div>
+            </div>
+          </div>
+
+          <div class="coordinates">
+            <strong>Student Coordinates:</strong><br>
+            Lat: <span id="studentLat">--</span>, Lon: <span id="studentLon">--</span>
+          </div>
+
+          <div class="coordinates" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+            <strong>Venue Coordinates:</strong><br>
+            Lat: <span id="venueLat">--</span>, Lon: <span id="venueLon">--</span>
+          </div>
+
+          <div class="distance-display">
+            <div class="distance-item">
+              <div class="distance-label">Distance from Venue</div>
+              <div class="distance-value" id="distanceFromVenue">--</div>
+            </div>
+            <div class="distance-item">
+              <div class="distance-label">Required Radius</div>
+              <div class="distance-value" id="requiredRadius">--</div>
+            </div>
+          </div>
+
+          <div id="locationStatus" style="text-align: center; margin: 1.5rem 0;">
+            <!-- Eligibility status will be shown here -->
+          </div>
+
+          <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+            <button id="markAttendanceBtn" class="btn btn-success" onclick="markAttendance()" style="display: none; flex: 1;">
+              ✓ MARK ATTENDANCE
+            </button>
+            <button id="updateLocationBtn" class="btn btn-info" onclick="updateLocation()" style="flex: 1;">
+              🔄 Refresh Location
+            </button>
+          </div>
+        </div>
+
+        <!-- Attendance Result -->
+        <div id="attendanceResult" style="display: none; margin-top: 1rem;">
+          <!-- Success/Error messages shown here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Container -->
+  <div id="notification-container" class="notification-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/storage.js"></script>
+  <script src="js/dummy-data.js"></script>
+  <script src="js/location.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/attendance.js"></script>
+  <script src="js/student.js"></script>
+
+  <script>
+    let currentUser = null;
+    let currentSession = null;
+
+    window.addEventListener('load', () => {
+      if (!App.requireAuth() || !App.checkAccess('student')) return;
+      
+      currentUser = Auth.getCurrentUser();
+      loadAvailableSessions();
+    });
+
+    function loadAvailableSessions() {
+      const sessions = Student.getAvailableSessions(currentUser.id);
+      const select = document.getElementById('sessionSelect');
+      select.innerHTML = '';
+
+      if (sessions.length === 0) {
+        select.innerHTML = '<option value="">No available sessions at this time</option>';
+        return;
+      }
+
+      select.innerHTML = '<option value="">-- Select a session --</option>';
+      
+      sessions.forEach(session => {
+        const unit = Storage.getById('units', session.unitId);
+        const lecturer = Storage.getById('lecturers', session.lecturerId);
+        
+        select.innerHTML += `
+          <option value="${session.id}">
+            ${unit.code} - ${session.venue} (${session.date} ${session.startTime})
+          </option>
+        `;
+      });
+    }
+
+    function selectSession() {
+      const sessionId = document.getElementById('sessionSelect').value;
+      const details = document.getElementById('sessionDetailsContainer');
+
+      if (!sessionId) {
+        details.style.display = 'none';
+        document.getElementById('attendanceResult').style.display = 'none';
+        return;
+      }
+
+      currentSession = Storage.getById('attendanceSessions', sessionId);
+      if (!currentSession) return;
+
+      // Display session details
+      const unit = Storage.getById('units', currentSession.unitId);
+      const lecturer = Storage.getById('lecturers', currentSession.lecturerId);
+
+      document.getElementById('sessionUnitName').textContent = unit.name;
+      document.getElementById('sessionLecturerName').textContent = lecturer.name;
+      document.getElementById('sessionVenue').textContent = currentSession.venue;
+      document.getElementById('sessionTime').textContent = `${currentSession.startTime} - ${currentSession.endTime}`;
+      document.getElementById('sessionStatus').textContent = currentSession.status.toUpperCase();
+      document.getElementById('requiredRadius').textContent = `${currentSession.radius}m`;
+      document.getElementById('venueLat').textContent = currentSession.latitude.toFixed(5);
+      document.getElementById('venueLon').textContent = currentSession.longitude.toFixed(5);
+
+      details.style.display = 'block';
+
+      // Check if already attended
+      if (Attendance.isAttendanceMarked(currentUser.id, sessionId)) {
+        App.notify('ℹ You have already marked attendance for this session', 'info');
+        document.getElementById('markAttendanceBtn').style.display = 'none';
+      } else {
+        document.getElementById('markAttendanceBtn').style.display = 'inline-block';
+      }
+
+      // Start location tracking
+      updateLocation();
+    }
+
+    function updateLocation() {
+      const status = document.getElementById('locationStatus');
+      status.innerHTML = '<div style="text-align: center;"><div class="spinner-small"></div> Checking your location...</div>';
+
+      Location.getCurrentLocation()
+        .then(position => {
+          document.getElementById('studentLat').textContent = position.latitude.toFixed(5);
+          document.getElementById('studentLon').textContent = position.longitude.toFixed(5);
+
+          if (currentSession) {
+            const result = Location.isWithinAttendanceRadius(
+              position.latitude,
+              position.longitude,
+              currentSession.latitude,
+              currentSession.longitude,
+              currentSession.radius
+            );
+
+            document.getElementById('distanceFromVenue').textContent = `${result.distance}m`;
+            
+            const modeText = position.isDemoMode ? ' (Demo Mode - Simulated)' : ' (GPS)';
+            document.getElementById('locationSubtitle').textContent = `Location verified${modeText}`;
+
+            if (result.isWithinRadius) {
+              status.innerHTML = `
+                <div style="background-color: #D1FAE5; border: 2px solid var(--success); border-radius: 0.5rem; padding: 1rem; color: var(--success); font-weight: 600;">
+                  ✓ Within attendance area (${result.distance}m from venue)
+                </div>
+              `;
+              document.getElementById('markAttendanceBtn').style.display = 'inline-block';
+            } else {
+              status.innerHTML = `
+                <div style="background-color: #FEE2E2; border: 2px solid var(--danger); border-radius: 0.5rem; padding: 1rem; color: var(--danger); font-weight: 600;">
+                  ✕ Outside attendance area (${result.distance}m away, required: ${currentSession.radius}m)
+                </div>
+              `;
+              document.getElementById('markAttendanceBtn').style.display = 'none';
+            }
+          }
+        })
+        .catch(error => {
+          status.innerHTML = `<div style="color: var(--danger); font-weight: 600;">📍 ${error.message}</div>`;
+          document.getElementById('markAttendanceBtn').style.display = 'none';
+          App.notify(error.message, 'error');
+        });
+    }
+
+    function setDemoDistance(distance) {
+      Location.enableDemoMode(distance);
+      updateLocation();
+    }
+
+    function markAttendance() {
+      if (!currentSession) return;
+
+      // Validate preconditions
+      const validation = Attendance.markAttendance(currentUser.id, currentSession.id);
+
+      if (!validation.success) {
+        App.notify(validation.message, 'error');
+        document.getElementById('attendanceResult').innerHTML = `
+          <div style="background-color: #FEE2E2; border: 1px solid var(--danger); border-radius: 0.5rem; padding: 1rem; color: var(--danger);">
+            <h4 style="margin: 0 0 0.5rem;">✕ Attendance Not Marked</h4>
+            <p>${validation.message}</p>
+          </div>
+        `;
+        document.getElementById('attendanceResult').style.display = 'block';
+        return;
+      }
+
+      // Get location and verify
+      Location.getCurrentLocation()
+        .then(position => {
+          const result = Location.isWithinAttendanceRadius(
+            position.latitude,
+            position.longitude,
+            currentSession.latitude,
+            currentSession.longitude,
+            currentSession.radius
+          );
+
+          if (!result.isWithinRadius) {
+            App.notify(`✕ You are outside the attendance area (${result.distance}m away)`, 'error');
+            document.getElementById('attendanceResult').innerHTML = `
+              <div style="background-color: #FEE2E2; border: 1px solid var(--danger); border-radius: 0.5rem; padding: 1rem; color: var(--danger);">
+                <h4 style="margin: 0 0 0.5rem;">✕ Distance Verification Failed</h4>
+                <p>You are ${result.distance}m away. Required radius: ${currentSession.radius}m</p>
+              </div>
+            `;
+            document.getElementById('attendanceResult').style.display = 'block';
+            return;
+          }
+
+          // Record attendance
+          const attendanceRecord = Attendance.recordAttendance(
+            currentUser.id,
+            currentSession.id,
+            position.latitude,
+            position.longitude,
+            result.distance
+          );
+
+          if (attendanceRecord.success) {
+            App.notify('✓ Attendance marked successfully!', 'success');
+            
+            const record = attendanceRecord.record;
+            const unit = Storage.getById('units', record.unitId);
+            
+            document.getElementById('attendanceResult').innerHTML = `
+              <div style="background-color: #D1FAE5; border: 1px solid var(--success); border-radius: 0.5rem; padding: 1rem; color: var(--success);">
+                <h4 style="margin: 0 0 0.5rem;">✓ Attendance Marked Successfully</h4>
+                <p><strong>${unit.name}</strong></p>
+                <p style="margin: 0.5rem 0 0;">
+                  <strong>Time:</strong> ${record.time}<br>
+                  <strong>Venue:</strong> ${record.sessionVenue}<br>
+                  <strong>Distance:</strong> ${record.distance}m from venue
+                </p>
+              </div>
+            `;
+            document.getElementById('attendanceResult').style.display = 'block';
+            document.getElementById('markAttendanceBtn').style.display = 'none';
+
+            // Redirect after delay
+            setTimeout(() => {
+              window.location.href = 'student-dashboard.html?tab=history';
+            }, 3000);
+          } else {
+            App.notify('Error recording attendance', 'error');
+          }
+        })
+        .catch(error => {
+          App.notify(error.message, 'error');
+        });
+    }
+  </script>
+</body>
+</html>

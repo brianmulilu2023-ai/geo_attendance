@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - GeoAttend Attendance System</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/auth.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <div class="auth-container">
+    <!-- Form Section -->
+    <div class="auth-form-section">
+      <div class="auth-form-card">
+        <h2>Welcome Back</h2>
+        
+        <div id="loginError" class="auth-error" style="display: none;"></div>
+        
+        <form id="loginForm" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label for="email" class="required">Email Address</label>
+            <input type="email" id="email" name="email" required placeholder="Enter your email">
+          </div>
+
+          <div class="form-group">
+            <label for="password" class="required">Password</label>
+            <input type="password" id="password" name="password" required placeholder="Enter your password">
+          </div>
+
+          <button type="submit" class="btn-submit">Login</button>
+        </form>
+
+        <div class="auth-link">
+          Don't have an account? <a href="register.html">Register here</a>
+        </div>
+
+        <!-- Demo Credentials -->
+        <div class="demo-credentials">
+          <h4>Demo Credentials</h4>
+          
+          <div class="credential-item">
+            <strong>Student:</strong><br>
+            📧 <code>student@demo.com</code> | 🔑 <code>123456</code>
+          </div>
+
+          <div class="credential-item">
+            <strong>Lecturer:</strong><br>
+            📧 <code>lecturer@demo.com</code> | 🔑 <code>123456</code>
+          </div>
+
+          <div class="credential-item">
+            <strong>Admin:</strong><br>
+            📧 <code>admin@demo.com</code> | 🔑 <code>admin123</code>
+          </div>
+        </div>
+
+        <div class="auth-info">
+          <strong>ℹ️ Note:</strong> This is a demonstration system. All data is stored locally in your browser.
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero Section -->
+    <div class="auth-hero-section">
+      <h1>GeoAttend</h1>
+      <p>Smart University Attendance Management System</p>
+      <p style="font-size: 1rem; margin-top: 2rem;">
+        Location-verified attendance tracking for modern educational institutions.
+      </p>
+      <div style="margin-top: 3rem; text-align: center;">
+        <p style="font-size: 0.9rem; opacity: 0.8;">
+          ✓ Location-based verification<br>
+          ✓ Real-time dashboards<br>
+          ✓ Role-based access control<br>
+          ✓ Comprehensive analytics
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Container -->
+  <div id="notification-container" class="notification-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/storage.js"></script>
+  <script src="js/dummy-data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    function handleLogin(event) {
+      event.preventDefault();
+
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const errorDiv = document.getElementById('loginError');
+
+      // Attempt login
+      const result = Auth.login(email, password);
+
+      if (result.success) {
+        App.notify('✓ Login successful! Redirecting...', 'success');
+        
+        // Redirect based on role
+        setTimeout(() => {
+          if (result.user.role === 'student') {
+            window.location.href = 'student-dashboard.html';
+          } else if (result.user.role === 'lecturer') {
+            window.location.href = 'lecturer-dashboard.html';
+          } else if (result.user.role === 'admin') {
+            window.location.href = 'admin-dashboard.html';
+          }
+        }, 1000);
+      } else {
+        errorDiv.textContent = result.message;
+        errorDiv.style.display = 'block';
+        App.notify(result.message, 'error');
+      }
+    }
+
+    // Check if already logged in
+    if (Auth.isLoggedIn()) {
+      const user = Auth.getCurrentUser();
+      if (user.role === 'student') {
+        window.location.href = 'student-dashboard.html';
+      } else if (user.role === 'lecturer') {
+        window.location.href = 'lecturer-dashboard.html';
+      } else if (user.role === 'admin') {
+        window.location.href = 'admin-dashboard.html';
+      }
+    }
+  </script>
+</body>
+</html>

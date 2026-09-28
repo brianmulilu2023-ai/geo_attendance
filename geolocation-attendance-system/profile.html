@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile - GeoAttend</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body style="background-color: var(--bg-light);">
+  <div style="max-width: 800px; margin: 2rem auto; padding: 0 1rem;">
+    <!-- Header -->
+    <div style="margin-bottom: 2rem;">
+      <a href="#" class="btn btn-secondary" onclick="goBack(event)">← Back</a>
+    </div>
+
+    <!-- Profile Container -->
+    <div class="card">
+      <div class="card-header" style="background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white;">
+        <h1 id="profileTitle" style="margin: 0; font-size: 1.875rem;">Profile</h1>
+        <p id="profileSubtitle" style="margin: 0.5rem 0 0; opacity: 0.9;">User Information</p>
+      </div>
+      
+      <div class="card-body">
+        <!-- Profile Info Section -->
+        <div>
+          <h3 style="margin-bottom: 1.5rem; border-bottom: 2px solid var(--border); padding-bottom: 1rem;">Account Information</h3>
+          
+          <div id="profileContent" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
+            <!-- Will be populated by JavaScript -->
+          </div>
+        </div>
+
+        <!-- Device Information -->
+        <div style="margin-top: 2rem;">
+          <h3 style="margin-bottom: 1.5rem; border-bottom: 2px solid var(--border); padding-bottom: 1rem;">Device & Security</h3>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
+            <div>
+              <label style="color: var(--text-light); font-size: 0.875rem; text-transform: uppercase; display: block;">Registered Device ID</label>
+              <p id="profileDeviceId" style="font-family: 'Monaco', 'Courier New', monospace; font-weight: 600; word-break: break-all; margin: 0.5rem 0 0;">-</p>
+              <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.5rem;">
+                Used to verify device identity (for demo purposes)
+              </div>
+            </div>
+            <div>
+              <label style="color: var(--text-light); font-size: 0.875rem; text-transform: uppercase; display: block;">Simulated IP Address</label>
+              <p id="profileIpAddress" style="font-family: 'Monaco', 'Courier New', monospace; font-weight: 600; margin: 0.5rem 0 0;">-</p>
+              <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.5rem;">
+                Demo purposes only (server-side verification required in production)
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: 1.5rem; padding: 1rem; background-color: #FEF3C7; border-left: 4px solid #F59E0B; border-radius: 0.5rem;">
+            <div style="font-size: 0.875rem; color: #92400E;">
+              <strong>⚠️ Security Notice:</strong> This is a frontend-only prototype. In production environments, device verification and IP address validation must be performed server-side with proper cryptographic binding and persistent database records.
+            </div>
+          </div>
+        </div>
+
+        <!-- Login Session Info -->
+        <div style="margin-top: 2rem;">
+          <h3 style="margin-bottom: 1.5rem; border-bottom: 2px solid var(--border); padding-bottom: 1rem;">Session Information</h3>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
+            <div>
+              <label style="color: var(--text-light); font-size: 0.875rem; text-transform: uppercase; display: block;">Login Time</label>
+              <p id="loginTime" style="font-weight: 600; margin: 0.5rem 0 0;">-</p>
+            </div>
+            <div>
+              <label style="color: var(--text-light); font-size: 0.875rem; text-transform: uppercase; display: block;">Session Duration</label>
+              <p id="sessionDuration" style="font-weight: 600; margin: 0.5rem 0 0;">-</p>
+            </div>
+            <div>
+              <label style="color: var(--text-light); font-size: 0.875rem; text-transform: uppercase; display: block;">Browser</label>
+              <p id="browserInfo" style="font-weight: 600; margin: 0.5rem 0 0; font-size: 0.875rem;">-</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Role-Specific Info -->
+        <div id="roleSpecificInfo" style="margin-top: 2rem;"></div>
+
+        <!-- Actions -->
+        <div style="margin-top: 2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+          <button class="btn btn-secondary" onclick="editProfile()" style="flex: 1;">
+            ✎ Edit Profile
+          </button>
+          <button class="btn btn-danger" onclick="confirmLogout()">
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Info -->
+    <div style="margin-top: 2rem; padding: 1rem; background-color: #DBEAFE; border-radius: 0.5rem; text-align: center; font-size: 0.875rem; color: var(--info);">
+      <strong>GeoAttend</strong> — University Student Geolocation-Based Attendance Management System<br>
+      <span style="font-size: 0.75rem;">Frontend Prototype | All data persisted in LocalStorage</span>
+    </div>
+  </div>
+
+  <!-- Notification Container -->
+  <div id="notification-container" class="notification-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/storage.js"></script>
+  <script src="js/dummy-data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/student.js"></script>
+  <script src="js/lecturer.js"></script>
+  <script src="js/admin.js"></script>
+
+  <script>
+    let currentUser = null;
+
+    window.addEventListener('load', () => {
+      if (!App.requireAuth()) return;
+      
+      currentUser = Auth.getCurrentUser();
+      loadProfileData();
+    });
+
+    function loadProfileData() {
+      const role = currentUser.role;
+      
+      // Set page title
+      const roleLabel = role.charAt(0).toUpperCase() + role.slice(1);
+      document.getElementById('profileTitle').textContent = `${currentUser.name}'s Profile`;
+      document.getElementById('profileSubtitle').textContent = `${roleLabel} Account`;
+
+      // Load base profile
+      if (role === 'student') {
+        loadStudentProfile();
+      } else if (role === 'lecturer') {
+        loadLecturerProfile();
+      } else if (role === 'admin') {
+        loadAdminProfile();
+      }
+
+      // Load common info
+      loadDeviceInfo();
+      loadSessionInfo();
+    }
+
+    function loadStudentProfile() {
+      const student = Storage.getById('students', currentUser.id);
+      
+      const content = `
+        <div>
+          <label style="color: var(--text-light); font-size: 0.875rem; text-transform: uppercase; display: block;">Full Name</label>
+          <p style="font-size: 1.125rem; font-weight: 600; margin: 0.5rem 0 0;">${student.name}</p>
+        </div>
+        <div>
+          <label style="color: var(--text-light); font-size: 0.875rem; text-transform: uppercase; display: block;">Email</label>
+          <p style="font-size: 1.125rem; font-weight: 600; margin: 0.5rem 0 0;">${student.email}</p>
+        </div>
+        <div>
+          <label style="color: var(--text-light); font-size: 0.875rem; text-transform: uppercase; display: block;">Registration Number</label>
+          <p style="font-size: 1.125rem; font-weight: 600; margin: 0.5rem 0 0;">${student.registrationNumber}</p>
+        </div>
+        <div>
+          <label style="color: var(--text-light); font-size: 0.875rem; text-transform: uppercase; display: block;">Phone</label>
+          <p style="font-size: 1.125rem; font-weight: 600; margin: 0.5rem 0 0;">${student.phoneNumber}</p>
+        </div>
+        <div>
+          <label style="color: var(--text-light); font-size: 0.875rem; text-transform: uppercase; display: block;">Course</label>
+          <p style="font-size: 1.125rem; font-weight: 600; margin: 0.5rem 0 0;">${student.course}</p>
+        </div>
+        <div>
+          <label style="color: var(--text-light); font-size: 0.875rem; text-transform: uppercase; display: block;">Year of Study</label>
+          <p style="font-size: 1.125rem; font-weight: 600; margin: 0.5rem 0 0;">Year ${student.yearOfStudy}</p>
+        </div>
+      `;
+      
+      document.getElementById('profileContent').innerHTML = content;
+
+      // Add student-specific info
+      const stats = Student.getDashboardData(currentUser.id);
+      const roleInfo = `
+        <div style="background-color: #E0F2FE; border-radius: 0.5rem; padding: 1.5rem;">
+          <h3 style="margin-top: 0;">Attendance Statistics</h3>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+            <div>
+              <div style="font-size: 0.875rem; color: var(--text-light);">Total Units</div>
+              <div style="font-size: 1.5rem; font-weight: 600; color: var(--info);">${stats.stats.totalUnits}</div>
+            </div>
+            <div>
+              <div style="font-size: 0.875rem; color: var(--text-light);">Attendance Rate</div>
+              <div style="font-size: 1.5rem; font-weight: 600; color: var(--info);">${App.formatPercentage(stats.stats.attendanceRate)}</div>
+            </div>
+            <div>
+              <div style="font-size: 0.875rem; color: var(--text-light);">Sessions Attended</div>
+              <div style="font-size: 1.5rem; font-weight: 600; color: var(--success);">${stats.stats.present}</div>
+            </div>
+            <div>
+              <div style="font-size: 0.875rem; color: var(--text-light);">Total Sessions</div>
+              <div style="font-size: 1.5rem; font-weight: 600;">${stats.stats.attendanceSessions}</div>
+            </div>
+          </div>
+        </div>
+      `;
+      document.getElementById('roleSpecificInfo').innerHTML = roleInfo;
+    }
+
+    function loadLecturerProfile() {
+      const lecturer = Storage.getById('lecturers', currentUser.id);
+      
+      const content = `
+        <div>
+          <label style="color: var(--text-light); font-size: 0.875rem; text-transform: uppercase; display: block;">Full Name</label>
+          <p style="font-size: 1.125rem; font-weight: 600; margin: 0.5rem 0 0;">${lecturer.name}</p>
+        </div>
+        <div>
+          <label style="color: var(--text-light); font-size: 0.875rem; text-transform: uppercase; display: block;">Email</label>
+          <p style="font-size: 1.125rem; font-weight: 600; margin: 0.5rem 0 0;">${lecturer.email}</p>
+        </div>
+        <div>
+          <label style="color: var(--text-light); font-size: 0.875rem; text-transform: uppercase; display: block;">Department</label>
+          <p style="font-size: 1.125rem; font-weight: 600; margin: 0.5rem 0 0;">${lecturer.department}</p>
+        </div>
+        <div>
+          <label style="color: var(--text-light); font-size: 0.875rem; text-transform: uppercase; display: block;">Phone</label>
+          <p style="font-size: 1.125rem; font-weight: 600; margin: 0.5rem 0 0;">${lecturer.phoneNumber}</p>
+        </div>
+      `;
+      
+      document.getElementById('profileContent').innerHTML = content;
+
+      // Add lecturer-specific info
+      const units = Lecturer.getLecturerUnits(currentUser.id);
+      const roleInfo = `
+        <div style="background-color: #FEF3C7; border-radius: 0.5rem; padding: 1.5rem;">
+          <h3 style="margin-top: 0;">Teaching Statistics</h3>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+            <div>
+              <div style="font-size: 0.875rem; color: var(--text-light);">Assigned Units</div>
+              <div style="font-size: 1.5rem; font-weight: 600; color: var(--warning);">${units.length}</div>
+            </div>
+            <div>
+              <div style="font-size: 0.875rem; color: var(--text-light);">Active Sessions</div>
+              <div style="font-size: 1.5rem; font-weight: 600; color: var(--warning);">${Lecturer.getDashboardData(currentUser.id).stats.activeSessions}</div>
+            </div>
+          </div>
+        </div>
+      `;
+      document.getElementById('roleSpecificInfo').innerHTML = roleInfo;
+    }
+
+    function loadAdminProfile() {
+      document.getElementById('profileContent').innerHTML = `
+        <div>
+          <label style="color: var(--text-light); font-size: 0.875rem; text-transform: uppercase; display: block;">Administrator</label>
+          <p style="font-size: 1.125rem; font-weight: 600; margin: 0.5rem 0 0;">System Administrator</p>
+        </div>
+        <div>
+          <label style="color: var(--text-light); font-size: 0.875rem; text-transform: uppercase; display: block;">Email</label>
+          <p style="font-size: 1.125rem; font-weight: 600; margin: 0.5rem 0 0;">${currentUser.email}</p>
+        </div>
+      `;
+
+      // Add admin-specific info
+      const stats = Admin.getSystemStats();
+      const roleInfo = `
+        <div style="background-color: #DDD6FE; border-radius: 0.5rem; padding: 1.5rem;">
+          <h3 style="margin-top: 0;">System Management</h3>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+            <div>
+              <div style="font-size: 0.875rem; color: var(--text-light);">Total Students</div>
+              <div style="font-size: 1.5rem; font-weight: 600;">${stats.totalStudents}</div>
+            </div>
+            <div>
+              <div style="font-size: 0.875rem; color: var(--text-light);">Total Lecturers</div>
+              <div style="font-size: 1.5rem; font-weight: 600;">${stats.totalLecturers}</div>
+            </div>
+            <div>
+              <div style="font-size: 0.875rem; color: var(--text-light);">Total Units</div>
+              <div style="font-size: 1.5rem; font-weight: 600;">${stats.totalUnits}</div>
+            </div>
+            <div>
+              <div style="font-size: 0.875rem; color: var(--text-light);">Attendance Records</div>
+              <div style="font-size: 1.5rem; font-weight: 600;">${stats.totalAttendanceRecords}</div>
+            </div>
+          </div>
+        </div>
+      `;
+      document.getElementById('roleSpecificInfo').innerHTML = roleInfo;
+    }
+
+    function loadDeviceInfo() {
+      const student = Storage.getById('students', currentUser.id) || 
+                      Storage.getById('lecturers', currentUser.id);
+      
+      if (student) {
+        document.getElementById('profileDeviceId').textContent = student.deviceId;
+        document.getElementById('profileIpAddress').textContent = student.ipAddress;
+      }
+    }
+
+    function loadSessionInfo() {
+      const now = new Date();
+      const sessionStartTime = new Date(); // Approximate
+      
+      // Format login time
+      const timeStr = now.toLocaleString();
+      document.getElementById('loginTime').textContent = timeStr;
+
+      // Calculate duration
+      document.getElementById('sessionDuration').textContent = 'Active session';
+
+      // Browser info
+      const userAgent = navigator.userAgent;
+      const browser = userAgent.includes('Chrome') ? 'Chrome' : 
+                     userAgent.includes('Firefox') ? 'Firefox' : 
+                     userAgent.includes('Safari') ? 'Safari' : 
+                     'Other';
+      document.getElementById('browserInfo').textContent = browser;
+    }
+
+    function editProfile() {
+      App.notify('ℹ Profile editing not available in demo mode', 'info');
+    }
+
+    function confirmLogout() {
+      if (confirm('Are you sure you want to logout?')) {
+        App.logout();
+      }
+    }
+
+    function goBack(event) {
+      event.preventDefault();
+      history.back();
+    }
+  </script>
+</body>
+</html>
