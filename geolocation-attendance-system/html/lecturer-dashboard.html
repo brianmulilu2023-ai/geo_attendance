@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lecturer Dashboard - GeoAttend</title>
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/dashboard.css">
-  <link rel="stylesheet" href="css/attendance.css">
-  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="../css/attendance.css">
+  <link rel="stylesheet" href="../css/responsive.css">
 </head>
 <body>
   <div class="dashboard-container">
@@ -165,7 +165,9 @@
             <div class="section-header">
               <h2>Create Attendance Session</h2>
             </div>
+            
             <form id="createSessionForm" class="session-form" onsubmit="handleCreateSession(event)">
+              <!-- Step 1: Basic Info -->
               <div class="form-row">
                 <div class="form-group">
                   <label for="unitSelect" class="required">Unit</label>
@@ -191,32 +193,97 @@
               </div>
 
               <div class="form-group">
-                <label for="venue" class="required">Venue / Location</label>
-                <input type="text" id="venue" required placeholder="e.g., Computer Lab 1">
+                <label for="venue" class="required">Venue / Location Name</label>
+                <input type="text" id="venue" required placeholder="e.g., Computer Lab 1, Main Auditorium">
               </div>
 
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="latitude" class="required">Latitude</label>
-                  <input type="number" id="latitude" step="0.00001" required placeholder="-1.0968">
+              <!-- Step 2: Location Selection -->
+              <div style="background-color: #F0F9FF; border: 2px solid var(--info); border-radius: 0.75rem; padding: 1.5rem; margin: 1.5rem 0;">
+                <h4 style="margin-top: 0; color: var(--info);">📍 Select Venue Location</h4>
+                
+                <!-- Location Selection Method -->
+                <div style="margin-bottom: 1.5rem;">
+                  <div style="font-weight: 600; margin-bottom: 0.75rem; color: var(--text-dark);">Choose a location method:</div>
+                  
+                  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+                    <button type="button" class="btn btn-info" onclick="selectLocationMethod('gps')" id="methodGPS">
+                      📡 Use GPS
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="selectLocationMethod('preset')" id="methodPreset">
+                      🏫 Campus Buildings
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="selectLocationMethod('manual')" id="methodManual">
+                      📌 Manual Entry
+                    </button>
+                  </div>
                 </div>
-                <div class="form-group">
-                  <label for="longitude" class="required">Longitude</label>
-                  <input type="number" id="longitude" step="0.00001" required placeholder="34.7535">
+
+                <!-- GPS Method -->
+                <div id="gpsMethod" style="display: none;">
+                  <button type="button" class="btn btn-success" onclick="useCurrentLocation()" style="width: 100%; padding: 1rem;">
+                    📍 Get Current Location (GPS)
+                  </button>
+                  <p style="font-size: 0.875rem; color: var(--text-light); margin-top: 0.75rem;">
+                    ℹ Requires location permission. Most accurate method.
+                  </p>
+                </div>
+
+                <!-- Preset Campus Locations -->
+                <div id="presetMethod" style="display: none;">
+                  <div style="font-weight: 600; margin-bottom: 0.75rem;">Quick Select Campus Locations:</div>
+                  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem;">
+                    <button type="button" class="btn btn-outline" onclick="selectPresetLocation('CSC Building', -1.2967, 36.8233)">🏢 CSC Building</button>
+                    <button type="button" class="btn btn-outline" onclick="selectPresetLocation('Computer Lab 1', -1.2954, 36.8245)">💻 Computer Lab 1</button>
+                    <button type="button" class="btn btn-outline" onclick="selectPresetLocation('Auditorium', -1.2945, 36.8260)">🎤 Auditorium</button>
+                    <button type="button" class="btn btn-outline" onclick="selectPresetLocation('Library', -1.2980, 36.8220)">📚 Library</button>
+                    <button type="button" class="btn btn-outline" onclick="selectPresetLocation('Sports Complex', -1.2900, 36.8300)">⚽ Sports Complex</button>
+                    <button type="button" class="btn btn-outline" onclick="selectPresetLocation('Science Lab', -1.2965, 36.8240)">🔬 Science Lab</button>
+                  </div>
+                </div>
+
+                <!-- Manual Entry Method -->
+                <div id="manualMethod" style="display: none;">
+                  <div style="background-color: white; border: 1px solid var(--border); border-radius: 0.5rem; padding: 1rem;">
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label for="latitude">Latitude</label>
+                        <input type="number" id="latitude" step="0.00001" placeholder="-1.2967">
+                      </div>
+                      <div class="form-group">
+                        <label for="longitude">Longitude</label>
+                        <input type="number" id="longitude" step="0.00001" placeholder="36.8233">
+                      </div>
+                    </div>
+                    <p style="font-size: 0.875rem; color: var(--text-light);">
+                      💡 Paste coordinates from Google Maps (right-click location → coordinates)
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Location Preview Map -->
+                <div id="locationPreview" style="background-color: white; border: 1px solid var(--border); border-radius: 0.5rem; padding: 1rem; margin-top: 1.5rem; display: none;">
+                  <div style="font-weight: 600; margin-bottom: 0.75rem;">Selected Location:</div>
+                  <canvas id="mapCanvas" style="width: 100%; height: 250px; background-color: #E0E7FF; border-radius: 0.5rem; cursor: crosshair; display: none;"></canvas>
+                  <div id="coordinateDisplay" style="background-color: #F8FAFC; border: 1px solid var(--border); border-radius: 0.375rem; padding: 0.75rem; font-family: monospace; font-size: 0.875rem;">
+                    <div>📍 Latitude: <span id="displayLat">-</span></div>
+                    <div>📍 Longitude: <span id="displayLon">-</span></div>
+                    <div style="margin-top: 0.5rem; color: var(--text-light);">Click on preset location or enter coordinates</div>
+                  </div>
                 </div>
               </div>
 
+              <!-- Attendance Radius -->
               <div class="form-group">
                 <label for="radius" class="required">Attendance Radius (meters)</label>
-                <input type="number" id="radius" value="10" required min="1">
+                <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                  <input type="number" id="radius" value="10" required min="1" max="100" style="flex: 1;">
+                  <button type="button" class="btn btn-sm btn-secondary" onclick="setRadius(5)">5m</button>
+                  <button type="button" class="btn btn-sm btn-secondary" onclick="setRadius(10)">10m</button>
+                  <button type="button" class="btn btn-sm btn-secondary" onclick="setRadius(20)">20m</button>
+                </div>
               </div>
 
-              <div class="form-group">
-                <button type="button" class="btn btn-info" onclick="useCurrentLocation()" style="width: 100%;">
-                  📍 Use My Current Location
-                </button>
-              </div>
-
+              <!-- Form Actions -->
               <div class="form-actions">
                 <button type="button" class="btn btn-secondary" onclick="resetSessionForm()">Reset</button>
                 <button type="submit" class="btn btn-primary">Create Session</button>
@@ -318,13 +385,13 @@
   <div id="notification-container" class="notification-container"></div>
 
   <!-- Scripts -->
-  <script src="js/storage.js"></script>
-  <script src="js/dummy-data.js"></script>
-  <script src="js/location.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/app.js"></script>
-  <script src="js/attendance.js"></script>
-  <script src="js/lecturer.js"></script>
+  <script src="../js/storage.js"></script>
+  <script src="../js/dummy-data.js"></script>
+  <script src="../js/location.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/attendance.js"></script>
+  <script src="../js/lecturer.js"></script>
 
   <script>
     let currentUser = null;
@@ -522,16 +589,147 @@
       setTodayDate();
     }
 
+    // Location Selection Methods
+    function selectLocationMethod(method) {
+      // Update button states
+      document.getElementById('methodGPS').className = method === 'gps' ? 'btn btn-info' : 'btn btn-secondary';
+      document.getElementById('methodPreset').className = method === 'preset' ? 'btn btn-info' : 'btn btn-secondary';
+      document.getElementById('methodManual').className = method === 'manual' ? 'btn btn-info' : 'btn btn-secondary';
+
+      // Show/hide method sections
+      document.getElementById('gpsMethod').style.display = method === 'gps' ? 'block' : 'none';
+      document.getElementById('presetMethod').style.display = method === 'preset' ? 'block' : 'none';
+      document.getElementById('manualMethod').style.display = method === 'manual' ? 'block' : 'none';
+    }
+
+    function selectPresetLocation(venueName, latitude, longitude) {
+      // Auto-fill venue name if not already set
+      if (!document.getElementById('venue').value) {
+        document.getElementById('venue').value = venueName;
+      }
+
+      // Set coordinates
+      document.getElementById('latitude').value = latitude.toFixed(5);
+      document.getElementById('longitude').value = longitude.toFixed(5);
+
+      // Show preview
+      updateLocationPreview(latitude, longitude);
+
+      // Show success feedback
+      App.notify(`✓ Location set: ${venueName}`, 'success');
+    }
+
     function useCurrentLocation() {
       Location.getCurrentLocation()
         .then(position => {
           document.getElementById('latitude').value = position.latitude.toFixed(5);
           document.getElementById('longitude').value = position.longitude.toFixed(5);
+
+          // Show preview
+          updateLocationPreview(position.latitude, position.longitude);
+
           App.notify('📍 Location captured from GPS', 'success');
         })
         .catch(error => {
           App.notify(error.message, 'error');
         });
+    }
+
+    function setRadius(radius) {
+      document.getElementById('radius').value = radius;
+    }
+
+    function updateLocationPreview(latitude, longitude) {
+      // Show location preview section
+      document.getElementById('locationPreview').style.display = 'block';
+
+      // Update coordinate display
+      document.getElementById('displayLat').textContent = latitude.toFixed(5);
+      document.getElementById('displayLon').textContent = longitude.toFixed(5);
+
+      // Draw simple map visualization
+      drawLocationMap(latitude, longitude);
+    }
+
+    function drawLocationMap(latitude, longitude) {
+      // For now, just show coordinate display - can be enhanced with canvas map
+      const mapCanvas = document.getElementById('mapCanvas');
+      if (mapCanvas && mapCanvas.getContext) {
+        try {
+          const ctx = mapCanvas.getContext('2d');
+          const width = mapCanvas.offsetWidth;
+          const height = mapCanvas.offsetHeight;
+
+          mapCanvas.width = width;
+          mapCanvas.height = height;
+
+          // Clear canvas
+          ctx.fillStyle = '#E0E7FF';
+          ctx.fillRect(0, 0, width, height);
+
+          // Draw grid
+          ctx.strokeStyle = '#C7D2FE';
+          ctx.lineWidth = 1;
+          for (let i = 0; i < width; i += 50) {
+            ctx.beginPath();
+            ctx.moveTo(i, 0);
+            ctx.lineTo(i, height);
+            ctx.stroke();
+          }
+          for (let i = 0; i < height; i += 50) {
+            ctx.beginPath();
+            ctx.moveTo(0, i);
+            ctx.lineTo(width, i);
+            ctx.stroke();
+          }
+
+          // Draw center crosshair
+          ctx.strokeStyle = '#4F46E5';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(width / 2, height / 2, 8, 0, Math.PI * 2);
+          ctx.stroke();
+
+          // Draw venue marker
+          ctx.fillStyle = '#4F46E5';
+          ctx.beginPath();
+          ctx.arc(width / 2, height / 2, 6, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Add text
+          ctx.fillStyle = '#4F46E5';
+          ctx.font = 'bold 14px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('📍 Venue Location', width / 2, 30);
+          ctx.font = '12px sans-serif';
+          ctx.fillText(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`, width / 2, height - 15);
+        } catch (e) {
+          console.log('Canvas not available');
+        }
+      }
+    }
+
+    // Initialize location method on page load
+    function initializeLocationSelection() {
+      // Set GPS as default method
+      selectLocationMethod('gps');
+
+      // Listen to coordinate input changes
+      document.getElementById('latitude').addEventListener('change', () => {
+        const lat = parseFloat(document.getElementById('latitude').value);
+        const lon = parseFloat(document.getElementById('longitude').value);
+        if (lat && lon) {
+          updateLocationPreview(lat, lon);
+        }
+      });
+
+      document.getElementById('longitude').addEventListener('change', () => {
+        const lat = parseFloat(document.getElementById('latitude').value);
+        const lon = parseFloat(document.getElementById('longitude').value);
+        if (lat && lon) {
+          updateLocationPreview(lat, lon);
+        }
+      });
     }
 
     function startSession(sessionId) {
@@ -623,6 +821,13 @@
         'profile': 'Profile'
       };
       document.getElementById('pageTitle').textContent = titles[tabName];
+
+      // Initialize location selection when switching to create-session tab
+      if (tabName === 'create-session') {
+        setTimeout(() => {
+          initializeLocationSelection();
+        }, 100);
+      }
     }
 
     function toggleSidebar() {

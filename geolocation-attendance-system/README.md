@@ -46,32 +46,39 @@ A complete frontend-only prototype of a geolocation-based attendance management 
 
 ```
 geolocation-attendance-system/
-├── index.html                 # Landing page
-├── login.html                 # Authentication page
-├── register.html              # Student registration
-├── student-dashboard.html     # Student interface
-├── lecturer-dashboard.html    # Lecturer interface
-├── admin-dashboard.html       # Admin interface
-├── attendance.html            # Attendance marking workflow
-├── profile.html               # User profile page
+├── index.html                 # Redirect page → html/index.html
+├── html/                      # All HTML pages
+│   ├── index.html             # Landing page
+│   ├── login.html             # Authentication page
+│   ├── register.html          # Student registration
+│   ├── student-dashboard.html # Student interface
+│   ├── lecturer-dashboard.html# Lecturer interface
+│   ├── admin-dashboard.html   # Admin interface
+│   ├── attendance.html        # Attendance marking workflow
+│   └── profile.html           # User profile page
 ├── css/
-│   ├── style.css             # Global styles and components
-│   ├── auth.css              # Authentication page styles
-│   ├── dashboard.css         # Dashboard layout styles
-│   ├── attendance.css        # Attendance-specific styles
-│   └── responsive.css        # Responsive design rules
+│   ├── style.css              # Global styles and components
+│   ├── auth.css               # Authentication page styles
+│   ├── dashboard.css          # Dashboard layout styles
+│   ├── attendance.css         # Attendance-specific styles
+│   └── responsive.css         # Responsive design rules
 ├── js/
-│   ├── storage.js            # LocalStorage data management
-│   ├── dummy-data.js         # Sample data initialization
-│   ├── location.js           # Geolocation and distance calculation
-│   ├── auth.js               # Authentication and authorization
-│   ├── app.js                # Core UI utilities
-│   ├── attendance.js         # Attendance logic and validation
-│   ├── student.js            # Student-specific functions
-│   ├── lecturer.js           # Lecturer-specific functions
-│   └── admin.js              # Admin management functions
-└── README.md                 # This file
+│   ├── storage.js             # LocalStorage data management
+│   ├── dummy-data.js          # Sample data initialization
+│   ├── location.js            # Geolocation and distance calculation
+│   ├── auth.js                # Authentication and authorization
+│   ├── app.js                 # Core UI utilities
+│   ├── attendance.js          # Attendance logic and validation
+│   ├── student.js             # Student-specific functions
+│   ├── lecturer.js            # Lecturer-specific functions
+│   └── admin.js               # Admin management functions
+├── assets/                    # Static assets (images, icons, etc.)
+└── README.md                  # This file
 ```
+
+### 📁 About the HTML Folder Structure
+
+All HTML files are organized in the `html/` folder to maintain a clean project structure. The root-level `index.html` serves as a redirect entry point that automatically directs to `html/index.html`. This organization keeps all presentation files together while keeping the root directory clean.
 
 ## Getting Started
 
@@ -86,7 +93,9 @@ geolocation-attendance-system/
 ### Installation
 
 1. Download or clone the project files
-2. Open `index.html` in a web browser
+2. Open `index.html` (from the root directory) in a web browser
+   - The root `index.html` will automatically redirect to `html/index.html`
+   - Alternatively, you can directly open `html/index.html` in your browser
 3. The system will automatically initialize with demo data
 
 ### Demo Credentials
@@ -152,17 +161,19 @@ If you don't have GPS enabled or want to test different scenarios:
 
 1. **Login**: Use lecturer@demo.com / 123456
 2. **Dashboard**: View assigned units and active sessions
-3. **Create Session**:
-   - Go to "Create Session" tab
-   - Select unit, set date/time
-   - Enter venue name and coordinates
-   - Set attendance radius (default: 10m)
-   - Optionally use "📍 Use My Current Location" button
-4. **Manage Sessions**:
+3. **Create Session** - Three location selection methods:
+   - **📡 Use GPS**: Get coordinates from device location (most accurate)
+   - **🏫 Campus Buildings**: Quick-select pre-configured venues (CSC Building, Lab, Auditorium, Library, Sports Complex, Science Lab)
+   - **📌 Manual Entry**: Paste coordinates from Google Maps (right-click location → coordinates)
+4. **Location Preview**: Real-time map visualization shows exactly where you're marking
+5. **Set Attendance Radius**: Use quick buttons (5m, 10m, 20m) or manual input
+6. **Manage Sessions**:
    - Start sessions when ready
    - View attendance for each session
    - End sessions when complete
-5. **Reports**: View attendance statistics and trends
+7. **Reports**: View attendance statistics and trends
+
+> **Quick Tip**: For campus locations, use the "Campus Buildings" quick-select - creates a session in under 30 seconds! See [LOCATION_SELECTION_GUIDE.md](LOCATION_SELECTION_GUIDE.md) for detailed instructions.
 
 ### For Administrators
 
